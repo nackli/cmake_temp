@@ -1,0 +1,66 @@
+// Auto-generated version header
+#ifndef VERSION_H
+#define VERSION_H
+
+#include <string>
+#include <string_view>
+
+// Git信息
+#define GIT_VERSION "@GIT_TAG@"
+#define GIT_COMMIT "@GIT_COMMIT@"
+#define BUILD_TIMESTAMP "@BUILD_TIMESTAMP@"
+
+namespace CreateVer {
+
+class VersionInfo {
+public:
+    // 获取版本字符串（tag优先，没有tag则显示commit）
+    static const char* version() {
+        return GIT_VERSION;
+    }
+    
+    // 获取完整的commit id
+    static const char* commit() {
+        return GIT_COMMIT;
+    }
+    
+    // 获取构建时间
+    static std::string buildTime() {
+        return std::string(__DATE__) + std::string(" ") + std::string(__TIME__);
+    }
+    
+    // 是否为脏构建（有未提交的修改）
+    static bool isDirty() {
+        #ifdef _MSC_VER
+            return std::string(GIT_VERSION).find("-dirty") != std::string::npos;
+        #else
+            return __builtin_strstr(GIT_VERSION, "-dirty") != nullptr;
+        #endif
+    }
+    
+    // 是否为发布版本（有tag且不是commit-开头）
+    static bool isRelease() {
+        #ifdef _MSC_VER
+            return std::string(GIT_VERSION).find("commit-") == 0;
+        #else
+            return __builtin_strstr(GIT_VERSION, "commit-") == GIT_VERSION;
+        #endif
+    }
+    
+    // 获取完整版本信息
+    static std::string fullInfo() {
+        std::string info = "Version: ";
+        info += version();
+        info += "\nCommit: ";
+        info += commit();
+        info += "\nBuild Time: ";
+        info += buildTime();
+        info += "\nDirty Build: ";
+        info += isDirty() ? "Yes" : "No";
+        return info;
+    }
+};
+
+} // namespace version
+
+#endif // VERSION_H
