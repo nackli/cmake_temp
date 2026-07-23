@@ -290,6 +290,26 @@ macro(_build_submodule_autotools TARGET)
         ${ARG_CONFIGURE_OPTS}
     )
 
+   # -- 交叉编译时自动添加 --host --
+    if(CMAKE_CROSSCOMPILING OR DEFINED CMAKE_TOOLCHAIN_FILE)
+        # 从编译器名称中提取 host triple (e.g. arm-linux-gnueabihf-gcc -> arm-linux-gnueabihf)
+        get_filename_component(_compiler_name "${CMAKE_C_COMPILER}" NAME)
+        if(_compiler_name MATCHES "^(.*)-gcc$")
+            set(_host_triple "${CMAKE_MATCH_1}")
+        elseif(_compiler_name MATCHES "^(.*)-clang$")
+            set(_host_triple "${CMAKE_MATCH_1}")
+        elseif(_compiler_name MATCHES "^(.*)-cc$")
+            set(_host_triple "${CMAKE_MATCH_1}")
+        endif()
+        if(_host_triple)
+            list(APPEND _configure_args "--host=${_host_triple}")
+            message(STATUS "  -> cross-compiling: adding --host=${_host_triple}")
+        else()
+            message(WARNING "  -> cross-compiling detected but cannot extract host triple from compiler '${_compiler_name}'")
+        endif()
+    endif()
+
+
     # -- autoreconf 前置 --
     if(ARG_AUTORECONF)
         string(JOIN " " _configure_args_str ${_configure_args})
