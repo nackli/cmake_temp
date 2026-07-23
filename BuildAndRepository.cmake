@@ -127,7 +127,7 @@ endmacro()
 
 function(BuildRepo TARGET)
     # ─── cmake_parse_arguments 解析关键词参数 ───
-    set(options   )   # 不设布尔 flag，避免 STATIC/SHARED 与 LIB_TYPE 的值冲突
+    set(options   )   # 布尔 flag (STATIC/SHARED 由 LIB_TYPE 统一处理)
     set(oneValue  GIT_REPO GIT_TAG URL URL_HASH LIB_TYPE BUILD_SYSTEM AUTORECONF
                   CONFIGURE_CMD BUILD_CMD INSTALL_CMD)
     set(multiValue DEPENDS BUILD_DEFINES DEFINES CMAKE_OPTS CONFIGURE_OPTS)
@@ -293,7 +293,6 @@ macro(_build_cmake TARGET)
             CMAKE_CACHE_ARGS   ${PASSTHROUGH_CMAKE_CACHE_ARGS}
             BUILD_COMMAND      cmake --build . --target install -- -j${_nproc_result}
             INSTALL_COMMAND    ""
-            CONFIGURE_COMMAND  ${CMAKE_COMMAND} ${_EFFECTIVE_CMAKE_ARGS} ${SOURCE_DIR}
             BUILD_BYPRODUCTS   "${INSTALL_DIR}/${BYPRODUCT}"
             INSTALL_DIR        ${INSTALL_DIR}
             EXCLUDE_FROM_ALL   TRUE
@@ -311,7 +310,6 @@ macro(_build_cmake TARGET)
             CMAKE_CACHE_ARGS   ${PASSTHROUGH_CMAKE_CACHE_ARGS}
             BUILD_COMMAND      cmake --build . --target install -- -j${_nproc_result}
             INSTALL_COMMAND    ""
-            CONFIGURE_COMMAND  ${CMAKE_COMMAND} ${_EFFECTIVE_CMAKE_ARGS} ${SOURCE_DIR}
             BUILD_BYPRODUCTS   "${INSTALL_DIR}/${BYPRODUCT}"
             INSTALL_DIR        ${INSTALL_DIR}
             EXCLUDE_FROM_ALL   TRUE
